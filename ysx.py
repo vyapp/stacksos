@@ -58,9 +58,8 @@ class Ysx:
         area.append('%s\n' % questions['items'][0]['title'], '(YSX-TITLE)')
         area.append('%s\n\n' % questions['items'][0]['body_markdown'], '(YSX-DESC)')
         area.append('By %s\n\n' % questions['items'][0]['owner']['display_name'], '(YSX-OWNER)')
-        items = answers['items']
 
-        for ind in items:
+        for ind in answers['items']:
             if ind.get('body_markdown'):
                 self.insert_answer(area, ind)
             else:
@@ -73,26 +72,24 @@ class Ysx:
     def insert_comment(self, area, comment):
         pass
 
-    def get_question(self, question_id, order='desc', sort='activity', 
-        site='stackoverflow', filter='!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'):
+    def get_question(self, question_id):
         STACK_URL = 'https://api.stackexchange.com/2.2/questions/%s?/%s'
     
-        params = {'order': order, 'sort': sort, 
-        'site': site, 'filter': filter}
+        params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
+        'filter': '!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'}
     
         url = STACK_URL % (question_id, urlencode(params))
         req = requests.get(url)
         return json.loads(req.text)
 
-    def get_answers(self, question_id, order='desc', sort='activity', 
-        site='stackoverflow', filter='!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'):
+    def get_answers(self, question_id):
         STACK_URL = 'https://api.stackexchange.com/2.2/questions/%s/answers?%s'
+        params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
+        'filter': '!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'}
 
-        params = {'order': order, 'sort': sort, 
-        'site': site, 'filter': filter}
-    
         url = STACK_URL % (question_id, urlencode(params))
         req = requests.get(url)
         return json.loads(req.text)
 
 install = Ysx
+
