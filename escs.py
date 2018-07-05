@@ -139,8 +139,40 @@ def get_answers(question_id, order='desc', sort='activity',
     req = requests.get(url)
     return json.loads(req.text)
 
-q = get_answers(47614013, filter='!2uDdBASlzGE6U5lW)pVBlUm5WP0s37p*nnpd1zxfWA')
+q = get_answers(20921619, filter='!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj')
+q['items'][0]['title']
+
+
+def get_answers(question_id, order='desc', sort='activity', 
+    site='stackoverflow', filter='!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'):
+    STACK_URL = 'https://api.stackexchange.com/2.2/questions/%s/answers?%s'
+    params = {'order': order, 'sort': sort, 
+    'site': site, 'filter': filter}
+    url = STACK_URL % (question_id, urlencode(params))
+    req = requests.get(url)
+    return json.loads(req.text)
+
+q = get_answers(19208725)
+q['items']
+q['items'][0]['title']
+
+def get_question(id, order='desc', sort='activity', 
+    site='stackoverflow', filter='!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'):
+    STACK_URL = 'https://api.stackexchange.com/2.2/questions/%s?/%s'
+    params = {'order': order, 'sort': sort, 
+    'site': site, 'filter': filter}
+    url = STACK_URL % (id, urlencode(params))
+    req = requests.get(url)
+    return json.loads(req.text)
+
+q = get_question(35977862)
 q['items']
 
+import re
+url='https://stackoverflow.com/questions/19208725/example-for-sync-waitgroup-correct'
+url = 'https://stackoverflow.com/a/35554720'
+
+mch = re.search('q[uestion]/([0-9]+)/?', url)
+mch.group(1)
 
 
