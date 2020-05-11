@@ -1,8 +1,8 @@
 from urllib.parse import urlencode
-import requests
 from vyapp.ask import Ask, Get
 from vyapp.app import root
-from gle import Google
+from subprocess import check_output
+import requests
 import json
 import re
 
@@ -10,44 +10,41 @@ import re
 class Ysx:
     TAGCONF = {
     '(YSX-TITLE)': {'foreground': '#FFAF33'},
-    '(YSX-DESC)': {'foreground': '#33B2FF'},
+    '(YSX-DESC)': {'foreground': '#DCDFD9'},
     '(YSX-URL)': {'foreground': '#7FEDA9'},
-    '(YSX-COMMENT)': {'foreground': '#7FEDA9'},
-    '(YSX-OWNER)': {'foreground': '#A9BFB1'}}
+    '(YSX-OWNER)': {'foreground': '#AFFF33'}}
 
     def __init__(self, area):
-        area.install('ysx', ('ALPHA', '<Control-x>', self.find),
-        ('ALPHA', '<Key-x>',  self.view))
+        area.install('ysx', ('EXTRA', '<Key-slash>', self.find),
+        ('EXTRA', '<Key-question>',  self.view))
 
         self.area = area
         self.area.tags_config(self.TAGCONF)
-        self.google  = Google(count=2)
 
     def find(self, event):
         ask   = Ask()
         self.area.delete('1.0', 'end')
-        query = 'stackoverflow %s' % ask.data
-        hits  = self.google.search(query)
-        REG   = 'stackoverflow.+/q[uestion]+/([0-9]+)/?'
+        data = check_output(['googler', '--json', '-w', 
+        'https://stackoverflow.com', ask.data])
 
-        for indi in hits:
-            for indj in indi:
-                if re.search(REG, indj['url']):
-                    self.insert_hits(indj)
+        hits = json.loads(data)
+        for ind in hits:
+            self.insert_hits(ind)
 
         self.area.chmode('NORMAL')
 
     def insert_hits(self, hit):
         self.area.append('%s\n' % hit['title'], '(YSX-TITLE)')
-        self.area.append('%s\n' % hit['desc'], '(YSX-DESC)')
+        self.area.append('%s\n' % hit['abstract'], '(YSX-DESC)')
         self.area.append('%s\n\n' % hit['url'], '(YSX-URL)')
 
     def view(self, event):
         REG = 'q[uestion]+/([0-9]+)/?'
-        url = self.area.get_seq()
+        url = self.area.get_line()
         mch = re.search(REG, url)
+
         question_id = mch.group(1)
-        questions   = self.get_question(question_id)
+        question    = self.get_question(question_id)
         answers     = self.get_answers(question_id)
 
         self.area.chmode('NORMAL')
@@ -55,39 +52,54 @@ class Ysx:
         area = root.note.create('none')
         area.delete('1.0', 'end')
 
-        area.append('%s\n' % questions['items'][0]['title'], '(YSX-TITLE)')
-        area.append('%s\n\n' % questions['items'][0]['body_markdown'], '(YSX-DESC)')
-        area.append('By %s\n\n' % questions['items'][0]['owner']['display_name'], '(YSX-OWNER)')
+        title = question['items'][0]['title']
+        title = 'Question title: %s\n' % title
+
+        markdown = question['items'][0]['body_markdown']
+        markdown = '%s\n\n' % markdown
+
+        owner = question['items'][0]['owner']['display_name']
+        owner = 'Question owner: %s\n' % owner
+
+        area.append(owner, '(YSX-OWNER)')
+        area.append(title, '(YSX-TITLE)')
+        area.append(markdown, '(YSX-DESC)')
 
         for ind in answers['items']:
-            if ind.get('body_markdown'):
-                self.insert_answer(area, ind)
-            else:
-                self.insert_comment(area, ind)
+            self.insert_answer(area, ind)
 
     def insert_answer(self, area, answer):
-        area.append('%s\n' % answer['body_markdown'], '(YSX-DESC)')
-        area.append('By %s\n\n' % answer['owner']['display_name'], '(YSX-OWNER)')
+        markdown = answer.get('body_markdown')
+        markdown = '%s\n' % markdown
+        owner    = answer.get('owner')
+        owner    = owner.get('display_name')
+        owner    = '\nAnswer owner: %s\n' % owner
 
-    def insert_comment(self, area, comment):
+        area.append(owner, '(YSX-OWNER)')
+        area.append(markdown, '(YSX-DESC)')
+
+    def get_answers_comments(self, answer_ids):
+        pass
+
+    def get_question_comments(self, question_id):
         pass
 
     def get_question(self, question_id):
-        STACK_URL = 'https://api.stackexchange.com/2.2/questions/%s?/%s'
+        URL = 'https://api.stackexchange.com/2.2/questions/%s?/%s'
     
         params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
         'filter': '!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'}
     
-        url = STACK_URL % (question_id, urlencode(params))
+        url = URL % (question_id, urlencode(params))
         req = requests.get(url)
         return json.loads(req.text)
 
     def get_answers(self, question_id):
-        STACK_URL = 'https://api.stackexchange.com/2.2/questions/%s/answers?%s'
+        URL = 'https://api.stackexchange.com/2.2/questions/%s/answers?%s'
         params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
         'filter': '!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'}
 
-        url = STACK_URL % (question_id, urlencode(params))
+        url = URL % (question_id, urlencode(params))
         req = requests.get(url)
         return json.loads(req.text)
 
