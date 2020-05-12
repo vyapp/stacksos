@@ -4,7 +4,7 @@ A vy plugin to integrate with StackOverflow.
 
 # Install
 
-StackSOS uses the python package googler to perform searches on StackOverflow.
+StackSOS uses the Python package googler to perform searches on StackOverflow.
 
 **See:** https://github.com/jarun/googler
 
