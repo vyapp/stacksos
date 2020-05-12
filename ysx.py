@@ -45,27 +45,36 @@ class Ysx:
 
         question_id = mch.group(1)
         question    = self.get_question(question_id)
-        answers     = self.get_answers(question_id)
+        question    = question['items'][0]
+        # answers     = self.get_answers(question_id)
+        answers     = question['answers']
+
+        comments    = question['comments']
 
         self.area.chmode('NORMAL')
 
         area = root.note.create('none')
         area.delete('1.0', 'end')
 
-        title = question['items'][0]['title']
+        title = question['title']
         title = 'Question title: %s\n' % title
 
-        markdown = question['items'][0]['body_markdown']
+        markdown = question['body_markdown']
         markdown = '%s\n\n' % markdown
 
-        owner = question['items'][0]['owner']['display_name']
+        owner = question['owner']['display_name']
         owner = 'Question owner: %s\n' % owner
 
         area.append(owner, '(YSX-OWNER)')
         area.append(title, '(YSX-TITLE)')
         area.append(markdown, '(YSX-DESC)')
 
-        for ind in answers['items']:
+        area.append('Comments:\n')
+
+        for ind in comments:
+            self.insert_question_comment(area, ind)
+
+        for ind in answers:
             self.insert_answer(area, ind)
 
     def insert_answer(self, area, answer):
@@ -78,17 +87,34 @@ class Ysx:
         area.append(owner, '(YSX-OWNER)')
         area.append(markdown, '(YSX-DESC)')
 
+    def insert_question_comment(self, area, comment):
+        markdown = comment.get('body_markdown')
+        markdown = '%s\n' % markdown
+        owner    = comment.get('owner')
+        owner    = owner.get('display_name')
+        owner    = 'Comment owner: %s\n' % owner
+
+        area.append(markdown, '(YSX-DESC)')
+        area.append(owner, '(YSX-OWNER)')
+
     def get_answers_comments(self, answer_ids):
         pass
 
     def get_question_comments(self, question_id):
-        pass
+        URL = 'https://api.stackexchange.com/2.2/questions/%s?/comments/%s'
+    
+        params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
+        'filter': '!187D_k.dW21CE4wnVmvCCHjNi1rEqE0P7SF3wsJUVl*oQQ8(zCjIIa34WstVfI'}
+    
+        url = URL % (question_id, urlencode(params))
+        req = requests.get(url)
+        return json.loads(req.text)
 
     def get_question(self, question_id):
         URL = 'https://api.stackexchange.com/2.2/questions/%s?/%s'
     
         params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
-        'filter': '!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'}
+        'filter': '!187D_k.dW21CE4wnVmvCCHjNi1rEqE0P7SF3wsJUVl*oQQ8(zCjIIa2yLgA_jn'}
     
         url = URL % (question_id, urlencode(params))
         req = requests.get(url)
@@ -104,4 +130,5 @@ class Ysx:
         return json.loads(req.text)
 
 install = Ysx
+
 
