@@ -7,7 +7,7 @@ import json
 import re
 
 
-class Ysx:
+class StackSOS:
     TAGCONF = {
     '(YSX-TITLE)': {'foreground': '#FFAF33'},
     '(YSX-DESC)': {'foreground': '#DCDFD9'},
@@ -22,17 +22,19 @@ class Ysx:
         self.area.tags_config(self.TAGCONF)
 
     def find(self, event):
+        root.status.set_msg('Search Topic:')
         ask  = Ask()
 
         data = check_output(['googler', '--json', '-w', 
         'https://stackoverflow.com', ask.data])
 
-        area = root.note.create('(?) %s' % ask.data[:15])
+        area = root.note.create('(?) %s...' % ask.data[:15])
         hits = json.loads(data)
 
         for ind in hits:
             self.insert_hits(area, ind)
         self.area.chmode('NORMAL')
+        root.status.set_msg('Found %s links.' % len(hits))
 
     def insert_hits(self, area, hit):
         area.append('%s\n' % hit['title'], '(YSX-TITLE)')
@@ -51,8 +53,8 @@ class Ysx:
         self.area.chmode('NORMAL')
 
         title = question['title']
+        area  = root.note.create('(?) %s...' % title[:15])
         title = 'Question Title: %s\n' % title
-        area = root.note.create('(?) %s' % title[:15])
 
 
         markdown = question['body_markdown']
@@ -119,4 +121,4 @@ class Ysx:
         area.append(owner, '(YSX-OWNER)')
         area.append(markdown, '(YSX-DESC)')
 
-install = Ysx
+install = StackSOS

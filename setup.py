@@ -5,7 +5,7 @@ from distutils.core import setup
 setup(name="StackSOS",
       version="1.0.0",
       description="",
-      py_modules=["stack_sos"],
+      py_modules=["stacksos"],
       author="Iury O. G. Figueiredo",
       author_email="last.src@gmai.com",
       url='https://github.com/vyapp/ysx',
