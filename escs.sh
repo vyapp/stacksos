@@ -41,5 +41,10 @@ rm -fr dist
 git branch -a
 git checkout -b development
 git push --set-upstream origin development
+##############################################################################
+# Upload the package.
+python setup.py sdist register upload
+rm -fr dist
+
 
 
