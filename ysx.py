@@ -15,30 +15,31 @@ class Ysx:
     '(YSX-OWNER)': {'foreground': '#AFFF33'}}
 
     def __init__(self, area):
-        area.install('ysx', ('EXTRA', '<Key-slash>', self.find),
-        ('EXTRA', '<Key-question>',  self.view))
+        area.install('ysx', ('EXTRA', '<Control-w>', self.find),
+        ('EXTRA', '<Key-W>',  self.view_question))
 
         self.area = area
         self.area.tags_config(self.TAGCONF)
 
     def find(self, event):
-        ask   = Ask()
-        self.area.delete('1.0', 'end')
+        ask  = Ask()
+
         data = check_output(['googler', '--json', '-w', 
         'https://stackoverflow.com', ask.data])
 
+        area = root.note.create(ask.data[:10])
         hits = json.loads(data)
-        for ind in hits:
-            self.insert_hits(ind)
 
+        for ind in hits:
+            self.insert_hits(area, ind)
         self.area.chmode('NORMAL')
 
-    def insert_hits(self, hit):
-        self.area.append('%s\n' % hit['title'], '(YSX-TITLE)')
-        self.area.append('%s\n' % hit['abstract'], '(YSX-DESC)')
-        self.area.append('%s\n\n' % hit['url'], '(YSX-URL)')
+    def insert_hits(self, area, hit):
+        area.append('%s\n' % hit['title'], '(YSX-TITLE)')
+        area.append('%s\n' % hit['abstract'], '(YSX-DESC)')
+        area.append('%s\n\n' % hit['url'], '(YSX-URL)')
 
-    def view(self, event):
+    def view_question(self, event):
         REG = 'q[uestion]+/([0-9]+)/?'
         url = self.area.get_line()
         mch = re.search(REG, url)
@@ -49,11 +50,10 @@ class Ysx:
 
         self.area.chmode('NORMAL')
 
-        area = root.note.create('none')
-        area.delete('1.0', 'end')
-
         title = question['title']
         title = 'Question Title: %s\n' % title
+        area = root.note.create(title[:12])
+
 
         markdown = question['body_markdown']
         markdown = '%s\n\n' % markdown
