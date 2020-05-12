@@ -1,5 +1,5 @@
 from urllib.parse import urlencode
-from vyapp.ask import Ask, Get
+from vyapp.ask import Ask
 from vyapp.app import root
 from subprocess import check_output
 import requests
