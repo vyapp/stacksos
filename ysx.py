@@ -46,10 +46,6 @@ class Ysx:
         question_id = mch.group(1)
         question    = self.get_question(question_id)
         question    = question['items'][0]
-        # answers     = self.get_answers(question_id)
-        answers     = question['answers']
-
-        comments    = question['comments']
 
         self.area.chmode('NORMAL')
 
@@ -57,58 +53,26 @@ class Ysx:
         area.delete('1.0', 'end')
 
         title = question['title']
-        title = 'Question title: %s\n' % title
+        title = 'Question Title: %s\n' % title
 
         markdown = question['body_markdown']
         markdown = '%s\n\n' % markdown
 
         owner = question['owner']['display_name']
-        owner = 'Question owner: %s\n' % owner
+        owner = 'Question Owner: %s\n' % owner
 
         area.append(owner, '(YSX-OWNER)')
         area.append(title, '(YSX-TITLE)')
         area.append(markdown, '(YSX-DESC)')
 
-        area.append('Comments:\n')
+        answers   = question.get('answers', ())
+        qcomments = question.get('comments', ())
 
-        for ind in comments:
-            self.insert_question_comment(area, ind)
+        for ind in qcomments:
+            self.insert_qcomment(area, ind)
 
         for ind in answers:
             self.insert_answer(area, ind)
-
-    def insert_answer(self, area, answer):
-        markdown = answer.get('body_markdown')
-        markdown = '%s\n' % markdown
-        owner    = answer.get('owner')
-        owner    = owner.get('display_name')
-        owner    = '\nAnswer owner: %s\n' % owner
-
-        area.append(owner, '(YSX-OWNER)')
-        area.append(markdown, '(YSX-DESC)')
-
-    def insert_question_comment(self, area, comment):
-        markdown = comment.get('body_markdown')
-        markdown = '%s\n' % markdown
-        owner    = comment.get('owner')
-        owner    = owner.get('display_name')
-        owner    = 'Comment owner: %s\n' % owner
-
-        area.append(markdown, '(YSX-DESC)')
-        area.append(owner, '(YSX-OWNER)')
-
-    def get_answers_comments(self, answer_ids):
-        pass
-
-    def get_question_comments(self, question_id):
-        URL = 'https://api.stackexchange.com/2.2/questions/%s?/comments/%s'
-    
-        params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
-        'filter': '!187D_k.dW21CE4wnVmvCCHjNi1rEqE0P7SF3wsJUVl*oQQ8(zCjIIa34WstVfI'}
-    
-        url = URL % (question_id, urlencode(params))
-        req = requests.get(url)
-        return json.loads(req.text)
 
     def get_question(self, question_id):
         URL = 'https://api.stackexchange.com/2.2/questions/%s?/%s'
@@ -120,15 +84,39 @@ class Ysx:
         req = requests.get(url)
         return json.loads(req.text)
 
-    def get_answers(self, question_id):
-        URL = 'https://api.stackexchange.com/2.2/questions/%s/answers?%s'
-        params = {'order': 'desc', 'sort': 'activity', 'site': 'stackoverflow', 
-        'filter': '!WyX5UezTc0C3EZPZ*F2m.(TE3yxC7yJisQjzoZj'}
+    def insert_answer(self, area, answer):
+        markdown = answer.get('body_markdown')
+        markdown = '%s\n\n' % markdown
+        owner    = answer.get('owner')
+        owner    = owner.get('display_name')
+        owner    = '\nAnswer Owner: %s\n' % owner
 
-        url = URL % (question_id, urlencode(params))
-        req = requests.get(url)
-        return json.loads(req.text)
+        area.append(owner, '(YSX-OWNER)')
+        area.append(markdown, '(YSX-DESC)')
+
+        ecomments = answer.get('comments', [])
+
+        for ind in ecomments:
+            self.insert_ecomment(area, ind)
+
+    def insert_ecomment(self, area, comment):
+        markdown = comment.get('body_markdown')
+        markdown = '%s\n\n' % markdown
+        owner    = comment.get('owner')
+        owner    = owner.get('display_name')
+        owner    = 'Comment Owner: %s\n' % owner
+
+        area.append(owner, '(YSX-OWNER)')
+        area.append(markdown, '(YSX-DESC)')
+
+    def insert_qcomment(self, area, comment):
+        markdown = comment.get('body_markdown')
+        markdown = '%s\n\n' % markdown
+        owner    = comment.get('owner')
+        owner    = owner.get('display_name')
+        owner    = 'Comment Owner: %s\n' % owner
+
+        area.append(owner, '(YSX-OWNER)')
+        area.append(markdown, '(YSX-DESC)')
 
 install = Ysx
-
-
