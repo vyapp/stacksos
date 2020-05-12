@@ -31,6 +31,7 @@ In order to lookup a topic just press.
 
 ~~~
 <Control-w>
+~~~
 
 In EXTRA mode. Insert your topic then press return. It will create a new tab
 that contains all StackOverflow questions that are related to your inserted topic.
