@@ -2,15 +2,15 @@
 
 from distutils.core import setup
 
-setup(name="ysx",
+setup(name="StackSOS",
       version="1.0.0",
       description="",
-      py_modules=["ysx"],
+      py_modules=["stack_sos"],
       author="Iury O. G. Figueiredo",
-      author_email="ioliveira@id.uff.br",
+      author_email="last.src@gmai.com",
       url='https://github.com/vyapp/ysx',
-      download_url='https://github.com/vyapp/ysx/releases',
-      keywords=['vy', 'irc', 'chat', 'ysx'],
+      download_url='https://github.com/vyapp/stacksos/releases',
+      keywords=['vy', 'stackoverfow', 'stackexchange', 'stacksos'],
       classifiers=[])
 
 

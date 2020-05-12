@@ -27,7 +27,7 @@ class Ysx:
         data = check_output(['googler', '--json', '-w', 
         'https://stackoverflow.com', ask.data])
 
-        area = root.note.create(ask.data[:10])
+        area = root.note.create('(?) %s' % ask.data[:15])
         hits = json.loads(data)
 
         for ind in hits:
@@ -52,7 +52,7 @@ class Ysx:
 
         title = question['title']
         title = 'Question Title: %s\n' % title
-        area = root.note.create(title[:12])
+        area = root.note.create('(?) %s' % title[:15])
 
 
         markdown = question['body_markdown']
