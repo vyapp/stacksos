@@ -1,10 +1,10 @@
 ##############################################################################
 # initialize.
 cd ~/projects/
-git clone git@bitbucket.org:iogf/ysx.git ysx-code
+git clone git@bitbucket.org:iogf/stacksos.git stacksos-code
 ##############################################################################
 # push master.
-cd ~/projects/ysx-code
+cd ~/projects/stacksos-code
 # clean up all .pyc files. 
 find . -name "*.pyc" -exec rm -f {} \;
 
@@ -14,7 +14,7 @@ git commit -a
 git push -u origin master
 ##############################################################################
 # push development.
-cd ~/projects/ysx-code
+cd ~/projects/stacksos-code
 # clean up all .pyc files. 
 find . -name "*.pyc" -exec rm -f {} \;
 
@@ -24,8 +24,8 @@ git commit -a
 git push -u origin development
 
 ##############################################################################
-# install ysx.
-cd ~/projects/ysx-code
+# install stacksos.
+cd ~/projects/stacksos-code
 sudo bash -i
 python setup.py install
 rm -fr build
@@ -33,7 +33,7 @@ exit
 ##############################################################################
 # get it on pip.
 
-cd ~/projects/ysx-code
+cd ~/projects/stacksos-code
 python setup.py sdist register upload
 rm -fr dist
 ##############################################################################
