@@ -5,7 +5,7 @@ from subprocess import check_output
 import requests
 import json
 import re
-
+import html
 
 class StackSOS:
     TAGCONF = {
@@ -58,7 +58,7 @@ class StackSOS:
 
 
         markdown = question['body_markdown']
-        markdown = '%s\n\n' % markdown
+        markdown = '%s\n\n' % html.unescape(markdown)
 
         owner = question['owner']['display_name']
         owner = 'Question Owner: %s\n' % owner
@@ -88,7 +88,7 @@ class StackSOS:
 
     def insert_answer(self, area, answer):
         markdown = answer.get('body_markdown')
-        markdown = '%s\n\n' % markdown
+        markdown = '%s\n\n' % html.unescape(markdown)
         owner    = answer.get('owner')
         owner    = owner.get('display_name')
         owner    = '\nAnswer Owner: %s\n' % owner
@@ -103,7 +103,7 @@ class StackSOS:
 
     def insert_ecomment(self, area, comment):
         markdown = comment.get('body_markdown')
-        markdown = '%s\n\n' % markdown
+        markdown = '%s\n\n' % html.unescape(markdown)
         owner    = comment.get('owner')
         owner    = owner.get('display_name')
         owner    = 'Comment Owner: %s\n' % owner
@@ -113,7 +113,7 @@ class StackSOS:
 
     def insert_qcomment(self, area, comment):
         markdown = comment.get('body_markdown')
-        markdown = '%s\n\n' % markdown
+        markdown = '%s\n\n' % html.unescape(markdown)
         owner    = comment.get('owner')
         owner    = owner.get('display_name')
         owner    = 'Comment Owner: %s\n' % owner
