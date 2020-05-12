@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name="StackSOS",
       version="1.0.0",
-      description="",
+      description="Integrate vy with StackOverflow.",
       py_modules=["stacksos"],
       author="Iury O. G. Figueiredo",
       author_email="last.src@gmai.com",
